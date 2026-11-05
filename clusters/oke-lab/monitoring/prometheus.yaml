@@ -31,13 +31,75 @@ spec:
       interval: 1h
   values:
     alertmanager:
-      enabled: false
+      enabled: true
+      fullnameOverride: prometheus-alertmanager
+      persistence:
+        enabled: false
+      resources:
+        requests:
+          cpu: 20m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+      extraSecretMounts:
+        - name: discord-webhook
+          secretName: discord-webhook
+          mountPath: /etc/alertmanager/secrets/discord
+          readOnly: true
+      config:
+        enabled: true
+        route:
+          receiver: discord
+          group_by:
+            - alertname
+            - namespace
+            - persistentvolumeclaim
+          group_wait: 10s
+          group_interval: 1m
+          repeat_interval: 3h
+        receivers:
+          - name: discord
+            discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/discord/webhook-url
+                send_resolved: true
     kube-state-metrics:
       enabled: false
     prometheus-node-exporter:
       enabled: false
     prometheus-pushgateway:
       enabled: false
+    serverFiles:
+      alerting_rules.yml:
+        groups:
+          - name: pvc-lab
+            rules:
+              - alert: PodinfoPVCFreeSpaceLow
+                expr: |
+                  100 *
+                  kubelet_volume_stats_available_bytes{
+                    namespace="podinfo",
+                    persistentvolumeclaim="podinfo-data"
+                  }
+                  /
+                  kubelet_volume_stats_capacity_bytes{
+                    namespace="podinfo",
+                    persistentvolumeclaim="podinfo-data"
+                  } < 15
+                for: 30s
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Podinfo PVC has less than 15% free space"
+                  description: "Autoresizing is configured below 10% free space."
+
+              - alert: DiscordDeliveryTest
+                expr: vector(1)
+                for: 30s
+                labels:
+                  severity: info
+                annotations:
+                  summary: "OKE lab Discord alert delivery test"
+                  description: "Temporary test; no storage problem is indicated."      
     server:
       persistentVolume:
         enabled: false
@@ -54,5 +116,9 @@ spec:
           memory: 128Mi
         limits:
           memory: 512Mi
+      alertmanagers:
+        - static_configs:
+            - targets:
+                - prometheus-alertmanager.monitoring.svc.cluster.local:9093
       service:
         type: ClusterIP
