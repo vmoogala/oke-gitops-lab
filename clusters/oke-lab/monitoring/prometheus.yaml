@@ -91,15 +91,6 @@ spec:
                 annotations:
                   summary: "Podinfo PVC has less than 15% free space"
                   description: "Autoresizing is configured below 10% free space."
-
-              - alert: DiscordDeliveryTest
-                expr: vector(1)
-                for: 30s
-                labels:
-                  severity: info
-                annotations:
-                  summary: "OKE lab Discord alert delivery test"
-                  description: "Temporary test; no storage problem is indicated."      
     server:
       persistentVolume:
         enabled: false
