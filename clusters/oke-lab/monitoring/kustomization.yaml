@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - prometheus.yaml
   - pvc-autoresizer.yaml
+  - storageclass-autoresize.yaml
