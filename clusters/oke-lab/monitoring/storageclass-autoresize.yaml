@@ -3,6 +3,11 @@ kind: StorageClass
 metadata:
   name: oci-bv
   annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
     kustomize.toolkit.fluxcd.io/ssa: Merge
     kustomize.toolkit.fluxcd.io/prune: Disabled
     resize.topolvm.io/enabled: "true"
+provisioner: blockvolume.csi.oraclecloud.com
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
