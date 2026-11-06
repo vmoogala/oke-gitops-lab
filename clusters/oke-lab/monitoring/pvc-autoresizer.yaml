@@ -28,7 +28,8 @@ spec:
     controller:
       replicas: 1
       args:
-        prometheusURL: http://prometheus-server.monitoring.svc.cluster.local:80
+        useK8sMetricsApi: true
+        prometheusURL: ""
         namespaces:
           - podinfo
         interval: 30s
