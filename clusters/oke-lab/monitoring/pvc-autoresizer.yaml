@@ -44,3 +44,30 @@ spec:
         generate: true
     cert-manager:
       enabled: false
+---
+# Supplemental permissions for pvc-autoresizer's Kubernetes metrics mode.
+# nodes/proxy permits access to node proxy endpoints, not only metrics.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pvc-autoresizer-node-metrics
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list"]
+  - apiGroups: [""]
+    resources: ["nodes/proxy"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pvc-autoresizer-node-metrics
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pvc-autoresizer-node-metrics
+subjects:
+  - kind: ServiceAccount
+    name: pvc-autoresizer-controller
+    namespace: monitoring
