@@ -10,8 +10,8 @@ metadata:
   namespace: podinfo
   annotations:
     kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
-    resize.topolvm.io/threshold: "10%"
-    resize.topolvm.io/increase: "50Gi"
+    resize.topolvm.io/threshold: "5Gi"
+    resize.topolvm.io/increase: "10Gi"
     resize.topolvm.io/storage_limit: "100Gi"
 spec:
   accessModes:
